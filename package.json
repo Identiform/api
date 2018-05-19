@@ -1,0 +1,28 @@
+{
+  "name": "identiform-api",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "jest"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Identiform/api.git"
+  },
+  "author": "Tadas Talaikis <info@talaikis.com>",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/Identiform/api/issues"
+  },
+  "homepage": "https://github.com/Identiform/api#readme",
+  "dependencies": {
+    "cors": "^2.8.4",
+    "express": "^4.16.3",
+    "nodemailer": "^4.6.4"
+  },
+  "devDependencies": {
+    "jest": "^22.4.4"
+  }
+}
