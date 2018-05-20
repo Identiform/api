@@ -1,6 +1,8 @@
 const nodemailer = require('nodemailer')
 
-async function sendEmail(req, res) {
+function sendEmail(req, res) {
+  console.log('em')
+  console.log(req)
   const transporter = nodemailer.createTransport({
     host: process.env.REACT_APP_EMAIL_HOST,
     port: process.env.REACT_APP_EMAIL_PORT,
@@ -19,15 +21,12 @@ async function sendEmail(req, res) {
 
   transporter.sendMail(req.body, (error, info) => {
     if (error) {
-      console.log('Error occurred')
-      console.log(error.message)
-      return process.exit(1)
+      res.send(JSON.stringify({ res: 400, error: error.message }, null, 4))
     }
 
-    console.log('Message sent successfully!')
-    console.log(info)
-
     transporter.close()
-
+    res.send(JSON.stringify({ res: 200 }, null, 4))
   })
 }
+
+module.exports = sendEmail

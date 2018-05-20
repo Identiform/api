@@ -18,9 +18,23 @@
   },
   "homepage": "https://github.com/Identiform/api#readme",
   "dependencies": {
+    "assert": "^1.4.1",
+    "bitcore-mnemonic": "^1.5.0",
+    "bluebird": "^3.5.1",
+    "body-parser": "^1.18.3",
     "cors": "^2.8.4",
+    "data-forge": "^1.0.8",
+    "debug": "^3.1.0",
+    "dotenv": "^5.0.1",
     "express": "^4.16.3",
-    "nodemailer": "^4.6.4"
+    "express-winston": "^2.5.1",
+    "joi": "^13.3.0",
+    "milagro-crypto-js": "git+https://github.com/milagro-crypto/milagro-crypto-js.git",
+    "mkdirp": "^0.5.1",
+    "nodemailer": "^4.6.4",
+    "safe-buffer": "^5.1.2",
+    "web3-utils": "^1.0.0-beta.34",
+    "winston": "^2.4.2"
   },
   "devDependencies": {
     "jest": "^22.4.4"

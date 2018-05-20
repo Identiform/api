@@ -5,6 +5,10 @@ const ACTIONS = {
   },
   EMAIL: {
     SEND: 'EMAIL_SEND'
+  },
+  KEYS: {
+    GENERATE: 'KEYS_GENERATE',
+    ENCRYPT: 'KEYS_ENCRYPT'
   }
 }
 

@@ -1,19 +1,45 @@
+require('dotenv').config({ path: '../.env' })
+const assert = require('assert')
 const express = require('express')
 const path = require('path')
 const compression = require('compression')
-const app = express()
 const cors = require('cors')
-
+const web3utils = require('web3-utils')
+const winston = require('winston')
+const expressWinston = require('express-winston')
 const handlers = require('./handlers')
+const bodyParser = require('body-parser')
+
+const app = express()
+assert.strictEqual(web3utils.isAddress(process.env.OWNER), true, 'We need and owner!')
 
 app.use(cors())
+app.use(bodyParser.json())
 app.use(compression())
 
-app.post('/api', (req, res) => {
+app.use(expressWinston.logger({
+  transports: [
+    new winston.transports.File({
+      filename: 'error.log',
+      level: 'error'
+    }),
+    new winston.transports.Console({
+      json: true,
+      colorize: true
+    })
+  ],
+  meta: true,
+  msg: 'HTTP {{req.method}} {{req.url}} Time: {{res.responseTime}}ms',
+  expressFormat: false,
+  colorize: false
+}))
+
+app.post('/api', async (req, res) => {
+  res.setHeader('Content-Type', 'application/json')
   const handler = handlers[req.body.action]
 
   if (handler) {
-    handler(req, res)
+    await handler(req, res)
   } else {
     console.error(`${req.body.action} doesn't have defined handler`)
     res.sendStatus(500)
