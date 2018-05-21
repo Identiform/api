@@ -80,6 +80,28 @@ describe('api', () => {
     })
   })
 
+  it('should generate #3 key pair', async (done) => {
+    const body = {
+      action: 'KEYS_GENERATE',
+      data: {
+        pathname: path.join(process.cwd(), '__mocks__'),
+        user: '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'
+      }
+    }
+    await del(path.join(process.cwd(), '__mocks__', 'pk', '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'))
+    await del(path.join(process.cwd(), '__mocks__', 'mem', '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'))
+    await del(path.join(process.cwd(), '__mocks__', 'pub', '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'))
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
+      res.status.should.eql(200)
+      res.type.should.eql('application/json')
+      res.body.result.should.eql('done')
+      done()
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+
   it('private keys should not be empty', async (done) => {
     const privkeyLoc1 = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
     const privkeyLoc2 = path.join(process.cwd(), '__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
@@ -105,6 +127,7 @@ describe('api', () => {
       data: {
         pathname: path.join(process.cwd(), '__mocks__'),
         secretOwner: '0x6f41fffc0338e715e8aac4851afc4079b712af70',
+        salt: '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9',
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
         text: 'this is secret to everyone'
       }
@@ -118,8 +141,35 @@ describe('api', () => {
         if (!er) {
           const decoded = await decrypt(privKey, res.body.data)
           decoded.should.eql('this is secret to everyone')
+          done()
         }
+      }).catch((e) => {
+        console.log(e)
       })
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+  
+  it('should send emails', async (done) => {
+    const body = {
+      action: 'EMAIL_SEND',
+      data: {
+        apiKey: 'test',
+        email: {
+          to: 'Me <wqzx2dsvn37jra3t@ethereal.email>',
+          subject: '✔',
+          text: 'Hello to myself!',
+          html: '<p><b>Hello</b> to myself!</p>'
+        }
+      }
+    }
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+      res.status.should.eql(200)
+      res.type.should.eql('application/json')
+      res.body.result.should.eql('done')
+      res.body.messageSize.should.eql(557)
       done()
     })
   })

@@ -1,9 +1,35 @@
 const nodemailer = require('nodemailer')
 
-function sendEmail(req, res) {
-  console.log('em')
-  console.log(req)
-  const transporter = nodemailer.createTransport({
+const apiKey = process.env.NODE_ENV === 'testing' ? 'test' : process.env.REACT_APP_API_KEY
+
+const createTestAccount = () => {
+  nodemailer.createTestAccount((err, account) => {
+    if (err) {
+      console.error('Failed to create a testing account. ' + err.message)
+      return process.exit(1)
+    }
+
+    console.log('Credentials obtained for test account', account)
+
+    return account
+  })
+}
+
+let mailConfig
+if (process.env.NODE_ENV === 'testing') {
+  mailConfig = {
+    host: 'smtp.ethereal.email',
+    port: 587,
+    secure: false,
+    auth: {
+      user: 'zovw4qtl7zcy6lpj@ethereal.email',
+      pass: 'DraqNYc4jsHXcRtHAw'
+    },
+    logger: false,
+    debug: true
+  }
+} else {
+  mailConfig = {
     host: process.env.REACT_APP_EMAIL_HOST,
     port: process.env.REACT_APP_EMAIL_PORT,
     secure: process.env.REACT_APP_EMAIL_SECURE,
@@ -13,20 +39,27 @@ function sendEmail(req, res) {
     },
     logger: false,
     debug: false
-  },
-  {
-    from: 'identiForm <no-reply@identiform.com>'
   }
-  )
+}
 
-  transporter.sendMail(req.body, (error, info) => {
-    if (error) {
-      res.send(JSON.stringify({ res: 400, error: error.message }, null, 4))
-    }
+let transporter = nodemailer.createTransport(mailConfig, { from: 'identiForm <no-reply@identiform.com>' })
 
-    transporter.close()
-    res.send(JSON.stringify({ res: 200 }, null, 4))
-  })
+const sendEmail = (req, res) => {
+  if (req.body.data.apiKey === apiKey) {
+    transporter = nodemailer.createTransport(mailConfig)
+
+    transporter.sendMail(req.body.data.email, (error, info) => {
+      if (error) {
+        console.log(error)
+      }
+
+      transporter.close()
+
+      res.setHeader('Content-Type', 'application/json')
+      res.status(200).send(JSON.stringify({ result: 'done', messageSize: info.messageSize }))
+    })
+  }
 }
 
 module.exports = sendEmail
+module.exports.createTestAccount = createTestAccount
