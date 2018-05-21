@@ -34,8 +34,7 @@ app.use(expressWinston.logger({
   colorize: false
 }))
 
-app.post('/api', async (req, res) => {
-  res.setHeader('Content-Type', 'application/json')
+app.post('/', async (req, res) => {
   const handler = handlers[req.body.action]
 
   if (handler) {
@@ -47,9 +46,16 @@ app.post('/api', async (req, res) => {
 })
 
 const PORT = process.env.API_PORT ? process.env.API_PORT : 3001
-app.listen(PORT, '0.0.0.0', (err) => {
+const server = app.listen(PORT, '0.0.0.0', (err) => {
   if (err) {
     console.log(err)
   }
   console.info(`==> listening on http://localhost:${PORT}.`)
 })
+
+function stop() {
+  server.close()
+}
+
+module.exports = app
+module.exports.stop = stop

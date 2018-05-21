@@ -2,9 +2,9 @@ const CTX = require('milagro-crypto-js')
 const hexToBytes = require('./hexToBytes')
 const bytesToString = require('./bytesToString')
 
-function encrypt(key, text) {
-  const K = hexToBytes(key)
-  const M = hexToBytes(text)
+async function encrypt(key, text) {
+  const K = await hexToBytes(key)
+  const M = await hexToBytes(text)
   const ctx = new CTX()
   const mode = ctx.AES.ECB
   const a = new ctx.AES()

@@ -3,7 +3,7 @@ const stringToBytes = require('./stringToBytes')
 const bytesToString = require('./bytesToString')
 
 async function hash(text) {
-  const B = stringToBytes(text)
+  const B = await stringToBytes(text)
   const ctx = new CTX()
   const sha = ctx.HASH256.len
   let R = []

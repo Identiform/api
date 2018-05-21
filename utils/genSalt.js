@@ -1,4 +1,4 @@
-function genSalt(ctx) {
+async function genSalt(ctx) {
   const SALT = []
   const RAW = []
   const rng = new ctx.RAND()

@@ -1,4 +1,4 @@
-function getPassword(ctx, password) {
+async function getPassword(ctx, password) {
   return ctx.ECDH.stringtobytes(password)
 }
 
