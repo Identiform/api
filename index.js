@@ -25,6 +25,7 @@ app.use(expressWinston.logger({
     }),
     new winston.transports.Console({
       json: true,
+      silent: process.env.NODE_ENV === 'testing',
       colorize: true
     })
   ],
@@ -40,7 +41,7 @@ app.post('/', async (req, res) => {
   if (handler) {
     await handler(req, res)
   } else {
-    console.error(`${req.body.action} doesn't have defined handler`)
+    // console.error(`${req.body.action} doesn't have defined handler`)
     res.sendStatus(500)
   }
 })

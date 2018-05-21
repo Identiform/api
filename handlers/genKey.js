@@ -13,10 +13,10 @@ const bytesToString = require('../utils/bytesToString')
 async function genKey(req, res) {
   res.setHeader('Content-Type', 'application/json')
   const schema = Joi.object().keys({
-    [req.body.data.pathname]: Joi.string().alphanum(),
-    [req.body.data.user]: Joi.string().alphanum().min(42).max(42)
+    pathname: Joi.string().alphanum(),
+    user: Joi.string().alphanum().min(42).max(42)
   }).with('pathname', 'user')
-  Joi.validate(req, schema, async (err, val) => {
+  Joi.validate(req.body.data, schema, async (err, val) => {
     if (err) {
       // res.status(500).send(JSON.stringify({ error: err.message }))
     }
