@@ -1,4 +1,4 @@
-const Promise = require('bluebird')
+﻿const Promise = require('bluebird')
 const assert = require('assert')
 const request = require('supertest')
 const chai = require('chai')
@@ -8,7 +8,7 @@ chai.use(chaiHttp)
 const path = require('path')
 const fs = Promise.promisifyAll(require('fs'))
 let server
-const decrypt = require('../utils/decrypt')
+const decryptECDH = require('../utils/decryptECDH')
 
 async function del(f) {
   fs.unlink(f, () => { })
@@ -123,11 +123,10 @@ describe('api', () => {
 
   it('should encrypt text', async (done) => {
     const body = {
-      action: 'KEYS_ENCRYPT',
+      action: 'KEYS_ENCRYPT_ECDH',
       data: {
         pathname: path.join(process.cwd(), '__mocks__'),
-        secretOwner: '0x6f41fffc0338e715e8aac4851afc4079b712af70',
-        salt: '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9',
+        secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
         text: 'this is secret to everyone'
       }
@@ -136,21 +135,18 @@ describe('api', () => {
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
-      const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
+      const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+      const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
-          const decoded = await decrypt(privKey, res.body.data)
+          const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
           decoded.should.eql('this is secret to everyone')
           done()
         }
-      }).catch((e) => {
-        console.log(e)
       })
-    }).catch((e) => {
-      console.log(e)
     })
   })
-  
+
   it('should send emails', async (done) => {
     const body = {
       action: 'EMAIL_SEND',

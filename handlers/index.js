@@ -5,7 +5,8 @@ const handlers = {
   [ACTIONS.USERS.GET]: require('./userGet'),
   [ACTIONS.EMAIL.SEND]: require('./sendEmail'),
   [ACTIONS.KEYS.GENERATE]: require('./genKey.js'),
-  [ACTIONS.KEYS.ENCRYPT]: require('./encryptTxt')
+  [ACTIONS.KEYS.ENCRYPT.ECDSA]: require('./notImplemented'),
+  [ACTIONS.KEYS.ENCRYPT.ECDH]: require('./encryptTxt')
 }
 
 module.exports = handlers

@@ -1,11 +1,8 @@
-const crypto = require('crypto')
-const algorithm = 'aes-256-ctr'
+﻿const ECIES = require('bitcore-ecies')
 
-async function decrypt(password, text) {
-  const decipher = crypto.createDecipher(algorithm, password)
-  let dec = decipher.update(text, 'hex', 'utf8')
-  dec += decipher.final('utf8')
-  return dec
+const decrypt = async (priv, pub, txt) => {
+  const ecies = ECIES().privateKey(priv).publicKey(pub)
+  return ecies.decrypt(txt).toString()
 }
 
 module.exports = decrypt

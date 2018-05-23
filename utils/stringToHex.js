@@ -8,3 +8,5 @@ async function stringToHex(txt) {
 
   return result
 }
+
+module.exports = stringToHex

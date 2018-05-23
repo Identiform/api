@@ -1,12 +1,11 @@
 async function bytesToString(b) {
   let s = ''
   const len = b.length
-  let ch
+  let char
 
   for (let i = 0; i < len; i++) {
-    ch = b[i]
-    s += ((ch >>> 4) & 15).toString(16)
-    s += (ch & 15).toString(16)
+    char = b[i]
+    s += String.fromCharCode(char)
   }
 
   return s

@@ -2,15 +2,14 @@ const Promise = require('bluebird')
 const Joi = require('joi')
 const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
-const Mnemonic = require('bitcore-mnemonic')
+const bip39 = require('bip39')
 const mkdirpAsync = Promise.promisify(require('mkdirp'))
 const CTX = require('milagro-crypto-js')
 const genKeyPair = require('../utils/genKeyPair')
 const genPrivateKey = require('../utils/genPrivateKey')
-const hash = require('../utils/hash')
 const bytesToString = require('../utils/bytesToString')
 
-async function genKey(req, res) {
+const genKey = async (req, res) => {
   res.setHeader('Content-Type', 'application/json')
   const schema = Joi.object().keys({
     pathname: Joi.string().alphanum(),
@@ -20,10 +19,10 @@ async function genKey(req, res) {
     if (err) {
       // res.status(500).send(JSON.stringify({ error: err.message }))
     }
-    const code = new Mnemonic()
-    const mnemHash = await hash(code.toString())
+    const code = bip39.generateMnemonic()
+    const mnemHex = bip39.mnemonicToSeedHex(code)
     const ctx = new CTX('BN254')
-    const privKey = await genPrivateKey(ctx, mnemHash)
+    const privKey = await genPrivateKey(ctx, mnemHex)
     const pubKey = await genKeyPair(ctx, privKey)
     const privKeyStr = await bytesToString(privKey)
     const pubKeyStr = await bytesToString(pubKey)
@@ -37,7 +36,7 @@ async function genKey(req, res) {
         return Promise.all([
           fs.writeFileAsync(privkeyLoc, privKeyStr, 'ascii'),
           fs.writeFileAsync(pubkeyLoc, pubKeyStr, 'ascii'),
-          fs.writeFileAsync(mLoc, mnemHash, 'ascii')
+          fs.writeFileAsync(mLoc, mnemHex, 'ascii')
         ])
       }
       return null

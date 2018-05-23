@@ -1,4 +1,4 @@
-async function commonKey(ctx, privKey0, privKey1, pubKey0, pubKey1) {
+const commonKey = async (ctx, privKey0, privKey1, pubKey0, pubKey1) => {
   const Z0 = []
   const Z1 = []
   ctx.ECDH.ECPSVDP_DH(privKey0, pubKey1, Z0)

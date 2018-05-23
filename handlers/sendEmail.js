@@ -42,7 +42,7 @@ if (process.env.NODE_ENV === 'testing') {
   }
 }
 
-let transporter = nodemailer.createTransport(mailConfig, { from: 'identiForm <no-reply@identiform.com>' })
+let transporter = nodemailer.createTransport(mailConfig)
 
 const sendEmail = (req, res) => {
   if (req.body.data.apiKey === apiKey) {
