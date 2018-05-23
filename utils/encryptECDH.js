@@ -1,4 +1,4 @@
-const CTX = require('milagro-crypto-js')
+﻿const CTX = require('milagro-crypto-js')
 const hexToBytes = require('./hexToBytes')
 const stringToBytes = require('./stringToBytes')
 const genRng = require('./genRng')

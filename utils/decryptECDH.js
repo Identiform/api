@@ -1,4 +1,4 @@
-const CTX = require('milagro-crypto-js')
+﻿const CTX = require('milagro-crypto-js')
 const bytesToString = require('./bytesToString')
 const hexToBytes = require('./hexToBytes')
 
@@ -25,7 +25,6 @@ const decryptECDH = async (priv, v, c, t) => {
   if (deciphered.length === 0) {
     console.error('ECIES Decryption Failed')
   } else {
-    console.log('Decryption succeeded')
     const decpoded = await bytesToString(deciphered)
     return decpoded
   }

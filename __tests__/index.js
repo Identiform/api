@@ -147,6 +147,89 @@ describe('api', () => {
     })
   })
 
+  it('should encrypt unicode text correctly', async (done) => {
+    const body = {
+      action: 'KEYS_ENCRYPT_ECDH',
+      data: {
+        pathname: path.join(process.cwd(), '__mocks__'),
+        secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+        user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+        text: escape('✔')
+      }
+    }
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+      res.status.should.eql(200)
+      res.type.should.eql('application/json')
+      const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+      const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+        if (!er) {
+          const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+          decoded.should.eql(escape('✔'))
+          done()
+        }
+      })
+    })
+  })
+
+  it('should encrypt HTML correctly', async (done) => {
+    const body = {
+      action: 'KEYS_ENCRYPT_ECDH',
+      data: {
+        pathname: path.join(process.cwd(), '__mocks__'),
+        secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+        user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+        text: '<p>secret text</p>'
+      }
+    }
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+      res.status.should.eql(200)
+      res.type.should.eql('application/json')
+      const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+      const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+        if (!er) {
+          const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+          decoded.should.eql('<p>secret text</p>')
+          done()
+        }
+      })
+    })
+  })
+
+  it('should encrypt large data objects correctly', async (done) => {
+    const blobLoc = path.join(process.cwd(), '__mocks__', 'blob.txt')
+    fs.readFile(blobLoc, 'ascii', async (er, blob) => {
+      if (!er) {
+        const body = {
+          action: 'KEYS_ENCRYPT_ECDH',
+          data: {
+            pathname: path.join(process.cwd(), '__mocks__'),
+            secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+            user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+            text: blob
+          }
+        }
+
+        chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+          res.status.should.eql(200)
+          res.type.should.eql('application/json')
+          const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+          const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+          fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+            if (!er) {
+              const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+              decoded.should.eql(blob)
+              done()
+            }
+          })
+        })
+      }
+    })
+  })
+
   it('should send emails', async (done) => {
     const body = {
       action: 'EMAIL_SEND',
