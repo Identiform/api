@@ -12,6 +12,12 @@ npm i
 npm start
 ```
 
+## Test
+
+```
+npm run test
+```
+
 ## Licence
 
 GPL-v3.0
