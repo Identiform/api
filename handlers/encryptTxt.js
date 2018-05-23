@@ -9,7 +9,6 @@ const mkdirpAsync = Promise.promisify(require('mkdirp'))
 const schema = Joi.object().keys({
   pathname: Joi.string().alphanum(),
   user: Joi.string().alphanum().min(42).max(42),
-  secretOwner: Joi.string().alphanum().min(42).max(42),
   text: Joi.string().alphanum()
 }).with('pathname', ['user', 'secretOwner', 'text'])
 
@@ -19,8 +18,7 @@ const encryptTxt = async (req, res) => {
     if (err) {
       // res.status(500).send(JSON.stringify({ res: 400, error: err.message }, null, 4))
     }
-    const privkeyLoc = path.join(req.body.data.pathname, 'pk', `${req.body.data.secretOwner}`)
-    const pubkeyLoc = path.join(req.body.data.pathname, 'pub', `${req.body.data.user}`)
+    const privkeyLoc = path.join(req.body.data.pathname, 'pk', `${req.body.data.user}`)
     if (fs.existsSync(privkeyLoc)) {
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {

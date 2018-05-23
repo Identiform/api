@@ -126,7 +126,6 @@ describe('api', () => {
       action: 'KEYS_ENCRYPT_ECDH',
       data: {
         pathname: path.join(process.cwd(), '__mocks__'),
-        secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
         text: 'this is secret to everyone'
       }
@@ -136,7 +135,6 @@ describe('api', () => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
@@ -152,9 +150,8 @@ describe('api', () => {
       action: 'KEYS_ENCRYPT_ECDH',
       data: {
         pathname: path.join(process.cwd(), '__mocks__'),
-        secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
-        text: escape('✔')
+        text: escape('✔test')
       }
     }
 
@@ -162,11 +159,10 @@ describe('api', () => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
-          decoded.should.eql(escape('✔'))
+          decoded.should.eql(escape('✔test'))
           done()
         }
       })
@@ -178,8 +174,7 @@ describe('api', () => {
       action: 'KEYS_ENCRYPT_ECDH',
       data: {
         pathname: path.join(process.cwd(), '__mocks__'),
-        secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
-        user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+        user: '0x6f41fffc0338e715e8aac4851afc4079b712af70',
         text: '<p>secret text</p>'
       }
     }
@@ -187,8 +182,7 @@ describe('api', () => {
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
-      const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+      const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
@@ -207,7 +201,6 @@ describe('api', () => {
           action: 'KEYS_ENCRYPT_ECDH',
           data: {
             pathname: path.join(process.cwd(), '__mocks__'),
-            secretOwner: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
             user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
             text: blob
           }
@@ -217,7 +210,6 @@ describe('api', () => {
           res.status.should.eql(200)
           res.type.should.eql('application/json')
           const privkeyLoc = path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-          const pubkeyLoc = path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
           fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
             if (!er) {
               const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
