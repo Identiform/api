@@ -137,7 +137,7 @@ describe('api', () => {
       const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
-          const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+          const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql('this is secret to everyone')
           done()
         }
@@ -161,7 +161,7 @@ describe('api', () => {
       const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
-          const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+          const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql(escape('✔test'))
           done()
         }
@@ -185,7 +185,7 @@ describe('api', () => {
       const privkeyLoc = path.join('__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
-          const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+          const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql('<p>secret text</p>')
           done()
         }
@@ -212,7 +212,7 @@ describe('api', () => {
           const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
           fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
             if (!er) {
-              const decoded = await decryptECDH(privKey, res.body.data.v, res.body.data.c, res.body.data.t)
+              const decoded = await decryptECDH(privKey, res.body.data)
               decoded.should.eql(blob)
               done()
             }
