@@ -1,4 +1,4 @@
-const Promise = require('bluebird')
+﻿const Promise = require('bluebird')
 const Joi = require('joi')
 const fs = Promise.promisifyAll(require('fs'))
 const path = require('path')
@@ -7,7 +7,7 @@ const mkdirpAsync = Promise.promisify(require('mkdirp'))
 const CTX = require('milagro-crypto-js')
 const genKeyPair = require('../utils/genKeyPair')
 const genPrivateKey = require('../utils/genPrivateKey')
-const bytesToString = require('../utils/bytesToString')
+const bytesToHex = require('../utils/bytesToHex')
 
 const genKey = async (req, res) => {
   res.setHeader('Content-Type', 'application/json')
@@ -24,8 +24,8 @@ const genKey = async (req, res) => {
     const ctx = new CTX('BN254')
     const privKey = await genPrivateKey(ctx, mnemHex)
     const pubKey = await genKeyPair(ctx, privKey)
-    const privKeyStr = await bytesToString(privKey)
-    const pubKeyStr = await bytesToString(pubKey)
+    const privKeyStr = await bytesToHex(privKey)
+    const pubKeyStr = await bytesToHex(pubKey)
     const mLoc = path.join(process.cwd(), req.body.data.pathname, 'mem', `${req.body.data.user}`)
     const privkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pk', `${req.body.data.user}`)
     const pubkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pub', `${req.body.data.user}`)
@@ -34,12 +34,12 @@ const genKey = async (req, res) => {
       // Check if pub key exists, because private keys are offline
       if (!fs.existsSync(pubkeyLoc)) {
         return Promise.all([
-          fs.writeFileAsync(privkeyLoc, privKeyStr, 'ascii'),
-          fs.writeFileAsync(pubkeyLoc, pubKeyStr, 'ascii'),
-          fs.writeFileAsync(mLoc, mnemHex, 'ascii')
+          fs.writeFileAsync(privkeyLoc, privKeyStr, 'utf8'),
+          fs.writeFileAsync(pubkeyLoc, pubKeyStr, 'utf8'),
+          fs.writeFileAsync(mLoc, mnemHex, 'utf8')
         ])
       }
-      return null
+      res.status(500)
     }).then(() => {
       res.status(200).send(JSON.stringify({ result: 'done' }))
     }).catch((e) => {

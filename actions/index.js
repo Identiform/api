@@ -11,6 +11,9 @@ const ACTIONS = {
     ENCRYPT: {
       ECDSA: 'KEYS_SIGN',
       ECDH: 'KEYS_ENCRYPT_ECDH'
+    },
+    DECRYPT: {
+      ECDH: 'KEYS_DECRYPT_ECDH'
     }
   }
 }

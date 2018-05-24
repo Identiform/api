@@ -10,6 +10,7 @@ const winston = require('winston')
 const expressWinston = require('express-winston')
 const handlers = require('./handlers')
 const bodyParser = require('body-parser')
+const apiKey = require('./utils/key')
 
 const app = express()
 assert.strictEqual(web3utils.isAddress(process.env.OWNER), true, 'We need and owner!')
@@ -37,12 +38,16 @@ app.use(expressWinston.logger({
 }))
 
 app.post('/', async (req, res) => {
-  const handler = handlers[req.body.action]
+  if (req.body.apiKey === apiKey) {
+    const handler = handlers[req.body.action]
 
-  if (handler) {
-    await handler(req, res)
+    if (handler) {
+      await handler(req, res)
+    } else {
+      // console.error(`${req.body.action} doesn't have defined handler`)
+      res.sendStatus(500)
+    }
   } else {
-    // console.error(`${req.body.action} doesn't have defined handler`)
     res.sendStatus(500)
   }
 })

@@ -1,4 +1,4 @@
-const genKeyPair = async (ctx, privKey) => {
+﻿const genKeyPair = async (ctx, privKey) => {
   const pubKey = []
   ctx.ECDH.KEY_PAIR_GENERATE(null, privKey, pubKey)
   const res = ctx.ECDH.PUBLIC_KEY_VALIDATE(pubKey)

@@ -1,4 +1,4 @@
-const genRng = async (ctx) => {
+﻿const genRng = async (ctx) => {
   const RAW = []
   const rng = new ctx.RAND()
 

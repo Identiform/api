@@ -1,4 +1,4 @@
-async function bytesToString(b) {
+﻿async function bytesToString(b) {
   let s = ''
   const len = b.length
   let char

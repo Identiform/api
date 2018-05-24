@@ -1,4 +1,4 @@
-const hexToString = async (hex) => {
+﻿const hexToString = async (hex) => {
   hex = hex.toString()
   let out = ''
   for (let i = 0; i < hex.length; i += 2) {

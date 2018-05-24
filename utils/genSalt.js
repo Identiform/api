@@ -1,4 +1,4 @@
-async function genSalt() {
+﻿async function genSalt() {
   const SALT = []
 
   for (let i = 0; i < 8; i++) {

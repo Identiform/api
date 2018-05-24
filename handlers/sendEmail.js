@@ -1,6 +1,4 @@
-const nodemailer = require('nodemailer')
-
-const apiKey = process.env.NODE_ENV === 'testing' ? 'test' : process.env.REACT_APP_API_KEY
+﻿const nodemailer = require('nodemailer')
 
 const createTestAccount = () => {
   nodemailer.createTestAccount((err, account) => {
@@ -45,20 +43,18 @@ if (process.env.NODE_ENV === 'testing') {
 let transporter = nodemailer.createTransport(mailConfig)
 
 const sendEmail = (req, res) => {
-  if (req.body.data.apiKey === apiKey) {
-    transporter = nodemailer.createTransport(mailConfig)
+  transporter = nodemailer.createTransport(mailConfig)
 
-    transporter.sendMail(req.body.data.email, (error, info) => {
-      if (error) {
-        console.log(error)
-      }
+  transporter.sendMail(req.body.data.email, (error, info) => {
+    if (error) {
+      console.log(error)
+    }
 
-      transporter.close()
+    transporter.close()
 
-      res.setHeader('Content-Type', 'application/json')
-      res.status(200).send(JSON.stringify({ result: 'done', messageSize: info.messageSize }))
-    })
-  }
+    res.setHeader('Content-Type', 'application/json')
+    res.status(200).send(JSON.stringify({ result: 'done', messageSize: info.messageSize }))
+  })
 }
 
 module.exports = sendEmail

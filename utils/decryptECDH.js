@@ -26,11 +26,11 @@ const decryptECDH = async (priv, blob) => {
   const deciphered = ctx.ECDH.ECIES_DECRYPT(sha, P1, P2, V, C, T, privKey)
   if (deciphered.length === 0) {
     console.error('ECIES Decryption Failed')
+    return null
   } else {
     const decpoded = await bytesToString(deciphered)
     return decpoded
   }
-  return null
 }
 
 module.exports = decryptECDH

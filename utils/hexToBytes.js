@@ -1,4 +1,4 @@
-const hexToBytes = async (value) => {
+﻿const hexToBytes = async (value) => {
   const byteValue = []
   const len = value.length
 

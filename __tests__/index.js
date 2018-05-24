@@ -25,6 +25,20 @@ afterEach(() => {
 describe('api', () => {
   it('should fail for unknown handler', async (done) => {
     const body = {
+      action: 'ZAZZZZ',
+      apiKey: 'test'
+    }
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
+      res.status.should.eql(500)
+      done()
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+
+  it('should fail without api key', async (done) => {
+    const body = {
       action: 'ZAZZZZ'
     }
 
@@ -39,6 +53,7 @@ describe('api', () => {
   it('should generate key pair', async (done) => {
     const body = {
       action: 'KEYS_GENERATE',
+      apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
         user: '0x6f41fffc0338e715e8aac4851afc4079b712af70'
@@ -58,9 +73,34 @@ describe('api', () => {
     })
   })
 
+  it('should not overwrite existing keys', async (done) => {
+    const body = {
+      action: 'KEYS_GENERATE',
+      apiKey: 'test',
+      data: {
+        pathname: path.join('__mocks__'),
+        user: '0x6f41fffc0338e715e8aac4851afc4079b712af70'
+      }
+    }
+
+    const privkeyLoc = path.join('__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
+    const pk = await fs.readFileSync(privkeyLoc)
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
+      fs.readFile(privkeyLoc, (e, pk1) => {
+        res.type.should.eql('application/json')
+        assert.deepEqual(pk, pk1)
+        done()
+      })
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+
   it('should generate #2 key pair', async (done) => {
     const body = {
       action: 'KEYS_GENERATE',
+      apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'
@@ -83,6 +123,7 @@ describe('api', () => {
   it('should generate #3 key pair', async (done) => {
     const body = {
       action: 'KEYS_GENERATE',
+      apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
         user: '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'
@@ -124,6 +165,7 @@ describe('api', () => {
   it('should encrypt text', async (done) => {
     const body = {
       action: 'KEYS_ENCRYPT_ECDH',
+      apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
@@ -132,10 +174,12 @@ describe('api', () => {
     }
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+      const blobLoc = path.join('__mocks__', 'blob2.txt')
+      fs.writeFileAsync(blobLoc, res.body.data, 'utf8')
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+      fs.readFile(privkeyLoc, 'utf8', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql('this is secret to everyone')
@@ -145,9 +189,32 @@ describe('api', () => {
     })
   })
 
+  it('should decrypt text', async (done) => {
+    const blobLoc = path.join('__mocks__', 'blob2.txt')
+    fs.readFile(blobLoc, 'utf8', async (er, blob) => {
+      const body = {
+        action: 'KEYS_DECRYPT_ECDH',
+        apiKey: 'test',
+        data: {
+          pathname: path.join('__mocks__'),
+          user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+          text: blob
+        }
+      }
+
+      chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+        res.status.should.eql(200)
+        res.type.should.eql('application/json')
+        res.body.data.should.eql('this is secret to everyone')
+        done()
+      })
+    })
+  })
+
   it('should encrypt unicode text correctly', async (done) => {
     const body = {
       action: 'KEYS_ENCRYPT_ECDH',
+      apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
@@ -159,7 +226,7 @@ describe('api', () => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+      fs.readFile(privkeyLoc, 'utf8', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql(escape('✔test'))
@@ -172,6 +239,7 @@ describe('api', () => {
   it('should encrypt HTML correctly', async (done) => {
     const body = {
       action: 'KEYS_ENCRYPT_ECDH',
+      apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
         user: '0x6f41fffc0338e715e8aac4851afc4079b712af70',
@@ -183,7 +251,7 @@ describe('api', () => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join('__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
-      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+      fs.readFile(privkeyLoc, 'utf8', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql('<p>secret text</p>')
@@ -195,10 +263,11 @@ describe('api', () => {
 
   it('should encrypt large data objects correctly', async (done) => {
     const blobLoc = path.join('__mocks__', 'blob.txt')
-    fs.readFile(blobLoc, 'ascii', async (er, blob) => {
+    fs.readFile(blobLoc, 'utf8', async (er, blob) => {
       if (!er) {
         const body = {
           action: 'KEYS_ENCRYPT_ECDH',
+          apiKey: 'test',
           data: {
             pathname: path.join('__mocks__'),
             user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
@@ -210,8 +279,8 @@ describe('api', () => {
           res.status.should.eql(200)
           res.type.should.eql('application/json')
           const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-          fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
-            if (!er) {
+          fs.readFile(privkeyLoc, 'utf8', async (e, privKey) => {
+            if (!e) {
               const decoded = await decryptECDH(privKey, res.body.data)
               decoded.should.eql(blob)
               done()
@@ -225,8 +294,8 @@ describe('api', () => {
   it('should send emails', async (done) => {
     const body = {
       action: 'EMAIL_SEND',
+      apiKey: 'test',
       data: {
-        apiKey: 'test',
         email: {
           to: 'Me <wqzx2dsvn37jra3t@ethereal.email>',
           subject: '✔',

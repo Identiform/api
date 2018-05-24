@@ -1,4 +1,4 @@
-const genSalt = require('./genSalt')
+﻿const genSalt = require('./genSalt')
 const getPassword = require('./getPassword')
 
 const genPrivateKey = async (ctx, password) => {
