@@ -18,7 +18,7 @@ const encryptTxt = async (req, res) => {
     if (err) {
       // res.status(500).send(JSON.stringify({ res: 400, error: err.message }, null, 4))
     }
-    const privkeyLoc = path.join(req.body.data.pathname, 'pk', `${req.body.data.user}`)
+    const privkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pk', `${req.body.data.user}`)
     if (fs.existsSync(privkeyLoc)) {
       fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {

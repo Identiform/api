@@ -26,9 +26,9 @@ const genKey = async (req, res) => {
     const pubKey = await genKeyPair(ctx, privKey)
     const privKeyStr = await bytesToString(privKey)
     const pubKeyStr = await bytesToString(pubKey)
-    const mLoc = path.join(req.body.data.pathname, 'mem', `${req.body.data.user}`)
-    const privkeyLoc = path.join(req.body.data.pathname, 'pk', `${req.body.data.user}`)
-    const pubkeyLoc = path.join(req.body.data.pathname, 'pub', `${req.body.data.user}`)
+    const mLoc = path.join(process.cwd(), req.body.data.pathname, 'mem', `${req.body.data.user}`)
+    const privkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pk', `${req.body.data.user}`)
+    const pubkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pub', `${req.body.data.user}`)
 
     return mkdirpAsync(req.body.data.pathname).then(() => {
       // Check if pub key exists, because private keys are offline
