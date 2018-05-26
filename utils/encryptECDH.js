@@ -26,7 +26,14 @@ const encryptECDH = async (pub, message) => {
   if (res !== 0) {
     console.error('ECP Public Key is invalid!')
   } else {
-    const based = Buffer.from(message).toString('base64')
+    let M
+    if (typeof message === 'object') {
+      M = JSON.stringify(message)
+    } else {
+      M = message
+    }
+
+    const based = Buffer.from(M).toString('base64')
     const msg = await stringToBytes(based)
     const C = ctx.ECDH.ECIES_ENCRYPT(sha, P1, P2, rng, pubKey, msg, V, T)
 

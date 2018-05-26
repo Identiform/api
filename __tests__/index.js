@@ -249,7 +249,7 @@ describe('api', () => {
           text: blob
         }
       }
-      
+
       chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
         res.status.should.eql(200)
         const d = JSON.parse(res.body.data)
