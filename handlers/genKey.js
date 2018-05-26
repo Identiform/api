@@ -21,7 +21,7 @@ const genKey = async (req, res) => {
     }
     const code = bip39.generateMnemonic()
     const mnemHex = bip39.mnemonicToSeedHex(code)
-    const ctx = new CTX('BN254')
+    const ctx = new CTX('NIST256')
     const privKey = await genPrivateKey(ctx, mnemHex)
     const pubKey = await genKeyPair(ctx, privKey)
     const privKeyStr = await bytesToHex(privKey)

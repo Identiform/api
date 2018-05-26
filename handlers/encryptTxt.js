@@ -3,7 +3,6 @@ const path = require('path')
 const Joi = require('joi')
 const fs = Promise.promisifyAll(require('fs'))
 const encryptECDH = require('../utils/encryptECDH')
-const stringToHex = require('../utils/stringToHex')
 const mkdirpAsync = Promise.promisify(require('mkdirp'))
 
 const schema = Joi.object().keys({
@@ -20,11 +19,10 @@ const encryptTxt = async (req, res) => {
     }
     const pubkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pub', `${req.body.data.user}`)
     if (fs.existsSync(pubkeyLoc)) {
-      fs.readFile(pubkeyLoc, 'utf8', async (er, pubKey) => {
+      fs.readFile(pubkeyLoc, 'ascii', async (er, pubKey) => {
         if (!er) {
           const encoded = await encryptECDH(pubKey, req.body.data.text)
-          const hexed = await stringToHex(encoded)
-          res.status(200).send(JSON.stringify({ data: hexed }))
+          res.status(200).send(JSON.stringify({ data: encoded }))
         }
       })
     }

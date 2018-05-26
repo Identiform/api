@@ -2,10 +2,9 @@
 const hexToBytes = require('./hexToBytes')
 const stringToBytes = require('./stringToBytes')
 const genRng = require('./genRng')
-const bytesToHex = require('./bytesToHex')
 
 const encryptECDH = async (pub, message) => {
-  const ctx = new CTX('BN254')
+  const ctx = new CTX('NIST256')
   const sha = ctx.ECDH.HASH_TYPE
 
   const P1 = []
@@ -27,14 +26,16 @@ const encryptECDH = async (pub, message) => {
   if (res !== 0) {
     console.error('ECP Public Key is invalid!')
   } else {
-    const msg = await stringToBytes(message)
-    const ciphertext = ctx.ECDH.ECIES_ENCRYPT(sha, P1, P2, rng, pubKey, msg, V, T)
+    const based = Buffer.from(message).toString('base64')
+    const msg = await stringToBytes(based)
+    const C = ctx.ECDH.ECIES_ENCRYPT(sha, P1, P2, rng, pubKey, msg, V, T)
 
-    const out = JSON.stringify({
-      v: await bytesToHex(V),
-      c: await bytesToHex(ciphertext),
-      t: await bytesToHex(T)
-    })
+    const out = {
+      v: V,
+      c: C,
+      t: T
+    }
+
     return out
   }
   return null

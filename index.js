@@ -11,12 +11,13 @@ const expressWinston = require('express-winston')
 const handlers = require('./handlers')
 const bodyParser = require('body-parser')
 const apiKey = require('./utils/key')
+const cache = require('memory-cache')
 
 const app = express()
 assert.strictEqual(web3utils.isAddress(process.env.OWNER), true, 'We need and owner!')
 
 app.use(cors())
-app.use(bodyParser.json())
+app.use(bodyParser.json({ limit: '10mb' }))
 app.use(compression())
 
 app.use(expressWinston.logger({

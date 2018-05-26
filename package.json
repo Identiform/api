@@ -33,6 +33,7 @@
     "express": "^4.16.3",
     "express-winston": "^2.5.1",
     "joi": "^13.3.0",
+    "memory-cache": "^0.2.0",
     "milagro-crypto-js": "git+https://github.com/milagro-crypto/milagro-crypto-js.git",
     "mkdirp": "^0.5.1",
     "nodemailer": "^4.6.4",

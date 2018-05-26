@@ -50,6 +50,20 @@ describe('api', () => {
     })
   })
 
+  it('should fail with wrong api key', async (done) => {
+    const body = {
+      action: 'KEYS_GENERATE',
+      apiKey: 'zz'
+    }
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
+      res.status.should.eql(500)
+      done()
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+
   it('should generate key pair', async (done) => {
     const body = {
       action: 'KEYS_GENERATE',
@@ -174,24 +188,58 @@ describe('api', () => {
     }
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
-      const blobLoc = path.join('__mocks__', 'blob2.txt')
-      fs.writeFileAsync(blobLoc, res.body.data, 'utf8')
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      fs.readFile(privkeyLoc, 'utf8', async (er, privKey) => {
+      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql('this is secret to everyone')
           done()
+        } else {
+          console.log(er)
         }
+      })
+    })
+  })
+
+  it('should encrypt objects correctly', async (done) => {
+    const body = {
+      action: 'KEYS_ENCRYPT_ECDH',
+      apiKey: 'test',
+      data: {
+        pathname: path.join('__mocks__'),
+        user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97',
+        text: JSON.stringify({ a: 'aaa', b: [0, 1], c: { k: 'a' }, d: 101 })
+      }
+    }
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
+      const blobLoc = path.join('__mocks__', 'blob2.txt')
+      await fs.writeFileAsync(blobLoc, JSON.stringify(res.body.data), 'ascii').then(() => {
+        res.status.should.eql(200)
+        res.type.should.eql('application/json')
+        const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
+        fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
+          if (!er) {
+            const decoded = JSON.parse(await decryptECDH(privKey, res.body.data))
+            decoded.a.should.eql('aaa')
+            decoded.d.should.eql(101)
+            done()
+          } else {
+            console.log(er)
+          }
+        })
       })
     })
   })
 
   it('should decrypt text', async (done) => {
     const blobLoc = path.join('__mocks__', 'blob2.txt')
-    fs.readFile(blobLoc, 'utf8', async (er, blob) => {
+    fs.readFile(blobLoc, 'ascii', async (er, blob) => {
+      if (er) {
+        console.log(er)
+      }
       const body = {
         action: 'KEYS_DECRYPT_ECDH',
         apiKey: 'test',
@@ -201,12 +249,16 @@ describe('api', () => {
           text: blob
         }
       }
-
+      
       chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then(async (res) => {
         res.status.should.eql(200)
+        const d = JSON.parse(res.body.data)
         res.type.should.eql('application/json')
-        res.body.data.should.eql('this is secret to everyone')
+        d.a.should.eql('aaa')
+        d.d.should.eql(101)
         done()
+      }).catch((e) => {
+        console.log(e)
       })
     })
   })
@@ -226,7 +278,7 @@ describe('api', () => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-      fs.readFile(privkeyLoc, 'utf8', async (er, privKey) => {
+      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql(escape('✔test'))
@@ -251,7 +303,7 @@ describe('api', () => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       const privkeyLoc = path.join('__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70')
-      fs.readFile(privkeyLoc, 'utf8', async (er, privKey) => {
+      fs.readFile(privkeyLoc, 'ascii', async (er, privKey) => {
         if (!er) {
           const decoded = await decryptECDH(privKey, res.body.data)
           decoded.should.eql('<p>secret text</p>')
@@ -263,7 +315,7 @@ describe('api', () => {
 
   it('should encrypt large data objects correctly', async (done) => {
     const blobLoc = path.join('__mocks__', 'blob.txt')
-    fs.readFile(blobLoc, 'utf8', async (er, blob) => {
+    fs.readFile(blobLoc, 'ascii', async (er, blob) => {
       if (!er) {
         const body = {
           action: 'KEYS_ENCRYPT_ECDH',
@@ -279,7 +331,7 @@ describe('api', () => {
           res.status.should.eql(200)
           res.type.should.eql('application/json')
           const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97')
-          fs.readFile(privkeyLoc, 'utf8', async (e, privKey) => {
+          fs.readFile(privkeyLoc, 'ascii', async (e, privKey) => {
             if (!e) {
               const decoded = await decryptECDH(privKey, res.body.data)
               decoded.should.eql(blob)
