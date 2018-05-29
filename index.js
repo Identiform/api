@@ -10,8 +10,20 @@ const winston = require('winston')
 const expressWinston = require('express-winston')
 const handlers = require('./handlers')
 const bodyParser = require('body-parser')
+const expressExpeditious = require('express-expeditious')
+
 const apiKey = require('./utils/key')
-const cache = require('memory-cache')
+
+const cache = expressExpeditious({
+  defaultTtl: 30000,
+  namespace: 'identiform',
+  engine: require('expeditious-engine-memory')(),
+  objectMode: true,
+
+  shouldCache: (req) => {
+    return req.method.toLowerCase() === 'post'
+  }
+})
 
 const app = express()
 assert.strictEqual(web3utils.isAddress(process.env.OWNER), true, 'We need and owner!')
@@ -40,6 +52,7 @@ app.use(expressWinston.logger({
 
 app.post('/', async (req, res) => {
   if (req.body.apiKey === apiKey) {
+    // const ck = `${req.body.action}_${req.body.data.user}`
     const handler = handlers[req.body.action]
 
     if (handler) {
@@ -49,7 +62,7 @@ app.post('/', async (req, res) => {
       res.sendStatus(500)
     }
   } else {
-    res.sendStatus(500)
+    res.sendStatus(401)
   }
 })
 

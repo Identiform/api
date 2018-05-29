@@ -3,3 +3,5 @@ node_modules/
 src/contracts/
 build/
 api/
+__mocks__/
+__mocks__/**/*

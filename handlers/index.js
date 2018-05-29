@@ -5,6 +5,7 @@ const handlers = {
   [ACTIONS.USERS.GET]: require('./userGet'),
   [ACTIONS.EMAIL.SEND]: require('./sendEmail'),
   [ACTIONS.KEYS.GENERATE]: require('./genKey.js'),
+  [ACTIONS.KEYS.DELETE]: require('./deleteKey.js'),
   [ACTIONS.KEYS.ENCRYPT.ECDSA]: require('./notImplemented'),
   [ACTIONS.KEYS.ENCRYPT.ECDH]: require('./encryptTxt'),
   [ACTIONS.KEYS.DECRYPT.ECDH]: require('./decryptTxt')

@@ -10,17 +10,17 @@ const fs = Promise.promisifyAll(require('fs'))
 let server
 const decryptECDH = require('../utils/decryptECDH')
 
-async function del(f) {
+function del(f) {
   fs.unlink(f, () => { })
 }
 
 beforeEach(() => {
   server = require('../')
-})
+});
 
 afterEach(() => {
   require('../').stop()
-})
+});
 
 describe('api', () => {
   it('should fail for unknown handler', async (done) => {
@@ -43,7 +43,7 @@ describe('api', () => {
     }
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
-      res.status.should.eql(500)
+      res.status.should.eql(401)
       done()
     }).catch((e) => {
       console.log(e)
@@ -57,7 +57,7 @@ describe('api', () => {
     }
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
-      res.status.should.eql(500)
+      res.status.should.eql(401)
       done()
     }).catch((e) => {
       console.log(e)
@@ -73,9 +73,10 @@ describe('api', () => {
         user: '0x6f41fffc0338e715e8aac4851afc4079b712af70'
       }
     }
-    await del(path.join('__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70'))
-    await del(path.join('__mocks__', 'mem', '0x6f41fffc0338e715e8aac4851afc4079b712af70'))
-    await del(path.join('__mocks__', 'pub', '0x6f41fffc0338e715e8aac4851afc4079b712af70'))
+
+    del(path.join(process.cwd(), '__mocks__', 'pk', '0x6f41fffc0338e715e8aac4851afc4079b712af70'))
+    del(path.join(process.cwd(), '__mocks__', 'mem', '0x6f41fffc0338e715e8aac4851afc4079b712af70'))
+    del(path.join(process.cwd(), '__mocks__', 'pub', '0x6f41fffc0338e715e8aac4851afc4079b712af70'))
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
       res.status.should.eql(200)
@@ -120,9 +121,10 @@ describe('api', () => {
         user: '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'
       }
     }
-    await del(path.join('__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'))
-    await del(path.join('__mocks__', 'mem', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'))
-    await del(path.join('__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'))
+
+    del(path.join(process.cwd(), '__mocks__', 'pk', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'))
+    del(path.join(process.cwd(), '__mocks__', 'mem', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'))
+    del(path.join(process.cwd(), '__mocks__', 'pub', '0xad8926fdb14c2ca283ab1e8a05c0b6707bc03f97'))
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
       res.status.should.eql(200)
@@ -140,17 +142,45 @@ describe('api', () => {
       apiKey: 'test',
       data: {
         pathname: path.join('__mocks__'),
-        user: '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'
+        user: '0xa1bf121993c23cc467eec8b7e453011dae250404'
       }
     }
-    await del(path.join('__mocks__', 'pk', '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'))
-    await del(path.join('__mocks__', 'mem', '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'))
-    await del(path.join('__mocks__', 'pub', '0x1cb0ff92ec067169fd6b1b12c6d39a4f6c2cf6f9'))
+
+    del(path.join('__mocks__', 'pk', '0xa1bf121993c23cc467eec8b7e453011dae250404'))
+    del(path.join('__mocks__', 'mem', '0xa1bf121993c23cc467eec8b7e453011dae250404'))
+    del(path.join('__mocks__', 'pub', '0xa1bf121993c23cc467eec8b7e453011dae250404'))
 
     chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
       res.status.should.eql(200)
       res.type.should.eql('application/json')
       res.body.result.should.eql('done')
+      done()
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+
+  it('should delete key upon request', async (done) => {
+    const body = {
+      action: 'KEYS_DELETE',
+      apiKey: 'test',
+      data: {
+        pathname: path.join('__mocks__'),
+        user: '0xa1bf121993c23cc467eec8b7e453011dae250404'
+      }
+    }
+
+    const privkeyLoc = path.join('__mocks__', 'pk', '0xa1bf121993c23cc467eec8b7e453011dae250404')
+    const pubkeyLoc = path.join('__mocks__', 'pub', '0xa1bf121993c23cc467eec8b7e453011dae250404')
+    const mLoc = path.join('__mocks__', 'mem', '0xa1bf121993c23cc467eec8b7e453011dae250404')
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
+      res.status.should.eql(200)
+      res.type.should.eql('application/json')
+      res.body.result.should.eql('done')
+      assert.deepEqual(fs.existsSync(privkeyLoc), false)
+      assert.deepEqual(fs.existsSync(pubkeyLoc), false)
+      assert.deepEqual(fs.existsSync(mLoc), false)
       done()
     }).catch((e) => {
       console.log(e)

@@ -13,10 +13,9 @@ const schema = Joi.object().keys({
 }).with('pathname', ['user', 'secretOwner', 'text'])
 
 const decryptTxt = async (req, res) => {
-  res.set('content-type', 'application/json; charset=utf8')
   Joi.validate(req.body.data, schema, async (err, val) => {
     if (err) {
-      // res.status(500).send(JSON.stringify({ res: 400, error: err.message }, null, 4))
+      // JSON.stringify({ res: 400, error: err.message })
     }
     const privkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pk', `${req.body.data.user}`)
     if (fs.existsSync(privkeyLoc)) {

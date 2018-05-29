@@ -8,6 +8,7 @@ const ACTIONS = {
   },
   KEYS: {
     GENERATE: 'KEYS_GENERATE',
+    DELETE: 'KEYS_DELETE',
     ENCRYPT: {
       ECDSA: 'KEYS_SIGN',
       ECDH: 'KEYS_ENCRYPT_ECDH'

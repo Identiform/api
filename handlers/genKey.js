@@ -31,12 +31,11 @@ const genKey = async (req, res) => {
     const pubkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pub', `${req.body.data.user}`)
 
     return mkdirpAsync(req.body.data.pathname).then(() => {
-      // Check if pub key exists, because private keys are offline
       if (!fs.existsSync(pubkeyLoc)) {
         return Promise.all([
-          fs.writeFileAsync(privkeyLoc, privKeyStr, 'utf8'),
-          fs.writeFileAsync(pubkeyLoc, pubKeyStr, 'utf8'),
-          fs.writeFileAsync(mLoc, mnemHex, 'utf8')
+          fs.writeFileAsync(privkeyLoc, privKeyStr, 'ascii'),
+          fs.writeFileAsync(pubkeyLoc, pubKeyStr, 'ascii'),
+          fs.writeFileAsync(mLoc, mnemHex, 'ascii')
         ])
       }
       res.status(500)
