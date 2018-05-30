@@ -53,7 +53,7 @@ const sendEmail = (req, res) => {
     transporter.close()
 
     res.setHeader('Content-Type', 'application/json')
-    res.status(200).send(JSON.stringify({ result: 'done', messageSize: info.messageSize }))
+    res.status(200).send(JSON.stringify({ result: 'done', info: info }))
   })
 }
 
