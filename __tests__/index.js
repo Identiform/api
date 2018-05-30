@@ -136,6 +136,27 @@ describe('api', () => {
     })
   })
 
+  it('cannot generate not eth address keys', async (done) => {
+    const body = {
+      action: 'KEYS_GENERATE',
+      apiKey: 'test',
+      data: {
+        pathname: path.join('__mocks__'),
+        user: '0xad8926fd14c2ca283ab1e8a05c0b6707bc03f97'
+      }
+    }
+
+    const privkeyLoc = path.join('__mocks__', 'pk', '0xad8926fd14c2ca283ab1e8a05c0b6707bc03f97')
+
+    chai.request(server).post('/').set('Content-Type', 'application/json').send(body).then((res) => {
+      res.type.should.eql('application/json')
+      expect(privkeyLoc).to.not.be.a.path()
+      done()
+    }).catch((e) => {
+      console.log(e)
+    })
+  })
+
   it('should generate #3 key pair', async (done) => {
     const body = {
       action: 'KEYS_GENERATE',

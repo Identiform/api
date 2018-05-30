@@ -5,7 +5,6 @@ const mkdirpAsync = Promise.promisify(require('mkdirp'))
 
 const delKey = async (req, res) => {
   res.setHeader('Content-Type', 'application/json')
-  console.log('req.body to del key')
 
   const mLoc = path.join(process.cwd(), req.body.data.pathname, 'mem', `${req.body.data.user}`)
   const privkeyLoc = path.join(process.cwd(), req.body.data.pathname, 'pk', `${req.body.data.user}`)
