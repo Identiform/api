@@ -10,7 +10,6 @@ then
 fi
 
 source activate $1
-API_PORT=$2 npm run build
 pm2 delete $1
 API_PORT=$2 pm2 start ./index.js --name "$1"
 source deactivate

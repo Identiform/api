@@ -1,5 +1,5 @@
 ﻿require('babel-polyfill')
-require('dotenv').config({ path: '../.env' })
+require('dotenv').config({ path: './.env' })
 const assert = require('assert')
 const express = require('express')
 const path = require('path')
