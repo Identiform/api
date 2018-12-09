@@ -1,0 +1,23 @@
+#!/bin/bash
+
+read_var() {
+    VAR=$(grep $1 $2 | xargs)
+    IFS="=" read -ra VAR <<< "$VAR"
+    echo ${VAR[1]#*=}
+}
+
+APP_NAME=$(read_var APP_NAME /root/.scripts/.env)
+PORT=$(read_var PROD_PORT /root/.scripts/.env)
+
+echo "Triger received. Deploying..."
+cd /opt/identiform_api
+git --git-dir=/opt/identiform_api.git --work-tree=/opt/identiform_api checkout master -f
+
+echo 'Installing'
+npm install
+
+echo 'Building...'
+PORT=$PORT npm run build
+
+echo 'Restarting server.' 
+pm2 reload "$APP_NAME"
