@@ -16,8 +16,6 @@ git --git-dir=/opt/identiform_api.git --work-tree=/opt/identiform_api checkout m
 echo 'Installing'
 npm install
 
-echo 'Building...'
-PORT=$PORT npm run build
-
 echo 'Restarting server.' 
-pm2 reload "$APP_NAME"
+PORT=$PORT pm2 reload "$APP_NAME"
+PORT=$PORT pm2 start ./index.js --name "$APP_NAME"
